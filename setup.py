@@ -24,7 +24,7 @@ with open("README.rst", "r") as f:
 
 setuptools.setup(
     name="metaextract",
-    version="0.0.4",
+    version="0.0.5",
     license="Apache-2.0",
     description="get metadata for python modules",
     long_description=long_description,
