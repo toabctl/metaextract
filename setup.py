@@ -34,11 +34,16 @@ setuptools.setup(
     packages=['metaextract'],
     setup_requires=["setuptools", "pytest-runner"],
     cmdclass=metaextract.setup.get_cmdclass(),
-    tests_require=["flake8", "pytest"],
+    tests_require=["flake8", "pytest", "mock"],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
     ],
+    entry_points={
+        'console_scripts': [
+            'metaextact=metaextract.cmds:main',
+        ],
+    }
 )
