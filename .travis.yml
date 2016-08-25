@@ -1,0 +1,23 @@
+sudo: false
+language: python
+matrix:
+  include:
+  - python: 2.7
+    env: TOX_ENV=pep8
+  - python: 2.7
+    env: TOX_ENV=py27
+  - python: 3.5
+    env: TOX_ENV=py35
+install:
+- pip install tox
+script:
+- tox -e $TOX_ENV
+deploy:
+  provider: pypi
+  user: toabctl
+  password:
+    secure: ZkPX6yT/KiRUXbSkSvvaXc60RJHaSHxKKGZu5vBs+PmaH9Xi3TSooCR9gWnPJGani0NS1+1Q7k3fjBfXNnrqhG6P0TyquVZbcpy1HnKnsUdN9pk67WTYSJILDKzPAGE9OdwgTkOMJ9Ib5/jRSr1sIIy5qEcKcUY742HYrdVgvsdg1v+W0pRHvAMxhmQeFtees2calQkWDYgSVGRe+hwmTHeEIsEak5v6cPAGjJ4OHTQTTyuMz9Vb+1m9Iw//NDIC+tP5azkkbeJ6kk7gO6s38Tr6VGqx4ZRpLHJ6dr4nLl3092eOqjFaWHIyYSxrfNaAIlX34Mu0uA0Ir/bXT5/vK8CA3Lw+Yezce3cCQg0yLDvjDn6Wdhpht6oTvEi+dfreE8SIXygaA0nYoGBUUiZyf5fothU+AaFB3uSXNkI19Qh3wej+iOUj3ObQv77FjnZQbl1NPlMXb4TGvMxpxTCTsSL6FLrnRfR9/9ZqzhSgm23f5ARM/OJlt5QYbcYzF3fieT1kkTOPiRC8roL/CIM7YyBGzQpytzRLSRGozD99cSltP3OU0CIhJYQOQ8j+Mg9U9i4S19+ZdMZtZOslS3d8qzDGD6U0WJFez+RZ8FFhFLYSB/ORvDz/Ini6DBIDo3HdzAgUON9Q88f5/zXuZspJFzZKZ5CWtRZ0+zUhx3Y0UeE=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: toabctl/metaextract
