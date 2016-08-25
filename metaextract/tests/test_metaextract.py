@@ -68,7 +68,7 @@ class TestMetaExtract(object):
         with pytest.raises(Exception) as e_info:
             with meta_utils._extract_to_tempdir("foobar"):
                 pass
-        assert "foobar" in e_info.value.message
+        assert "foobar" in str(e_info)
 
     def test__extract_to_tempdir_tar_archive(self, tararchive):
         tarball_name, tarball_files = tararchive
@@ -118,7 +118,7 @@ class TestSetupPyRunFromDir(object):
     def test_no_setup_py(self, tmpdir):
         with pytest.raises(Exception) as e_info:
             meta_utils._setup_py_run_from_dir(tmpdir.strpath)
-        assert tmpdir.strpath in e_info.value.message
+        assert tmpdir.strpath in str(e_info)
 
     def test_simple(self, tmpdir):
         setuppy = tmpdir.mkdir("setuppy").join("setup.py")
