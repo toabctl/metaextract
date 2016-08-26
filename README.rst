@@ -51,7 +51,11 @@ the repository root directory via `tox`_:
 
     $ tox
 
+Bugs
+----
+If you run into bugs, you can file them in the `issue tracker`_.
 
+.. _`issue tracker`: https://github.com/toabctl/metaextract/issues
 .. _`Python Package Index`: https://pypi.python.org/
 .. _`the repository`: https://github.com/toabctl/metaextract
 .. _`tox`: http://testrun.org/tox
