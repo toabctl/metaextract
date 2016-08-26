@@ -23,7 +23,7 @@ To extract the metadata for a python module using setup.py, do:
    $ metaextract my-archive-file.tar.gz
 
 This will print a json blob to stdout which contains i.e. ``install_requires``,
-``extras_require``` and friends extracted from the given archive file.
+``extras_require`` and friends extracted from the given archive file.
 
 If you already have some source code available (i.e. a git checkout) for some
 project you can also run the ``setup.py`` file with the ``metaextract``
