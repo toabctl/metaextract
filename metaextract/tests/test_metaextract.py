@@ -76,13 +76,23 @@ class TestMetaExtract(object):
 
     def test__extract_to_tempdir_tar_archive(self, tararchive):
         tarball_name, tarball_files = tararchive
-        with meta_utils._extract_to_tempdir(tarball_name):
+        current_cwd = os.getcwd()
+        with meta_utils._extract_to_tempdir(tarball_name) as tempdir:
             assert sorted(os.listdir(".")) == tarball_files
+        # back in the original working dir
+        assert current_cwd == os.getcwd()
+        # tempdir no longer exists
+        assert os.path.exists(tempdir) is False
 
     def test__extract_to_tempdir_zip_archive(self, ziparchive):
         zip_name, zip_files = ziparchive
-        with meta_utils._extract_to_tempdir(zip_name):
+        current_cwd = os.getcwd()
+        with meta_utils._extract_to_tempdir(zip_name) as tempdir:
             assert sorted(os.listdir(".")) == zip_files
+        # back in the original working dir
+        assert current_cwd == os.getcwd()
+        # tempdir no longer exists
+        assert os.path.exists(tempdir) is False
 
     def test__enter_single_subdir_0_dir(self, tmpdir):
         with meta_utils._enter_single_subdir(tmpdir.strpath) as dest_dir:
