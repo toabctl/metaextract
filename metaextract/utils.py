@@ -27,6 +27,11 @@ import tempfile
 import zipfile
 
 
+__all__ = [
+    "from_archive"
+]
+
+
 @contextmanager
 def _extract_to_tempdir(archive_filename):
     """extract the given tarball or zipfile to a tempdir and change
