@@ -23,6 +23,10 @@ import tarfile
 from metaextract import utils as meta_utils
 
 
+base_dir = os.path.dirname(__file__)
+fixtures_base_dir = os.path.join(base_dir, "fixtures")
+
+
 @pytest.fixture()
 def tararchive(tmpdir):
     """create a tarfile in a temp dir"""
@@ -112,49 +116,74 @@ class TestMetaExtract(object):
         data = meta_utils.from_archive(tar_name)
         assert data["data"]["install_requires"] == ['foo', 'bar']
 
-
-class TestSetupPyRunFromDir(object):
-    """all these tests are running the function _setup_py_run_from_dir()"""
     def test_no_setup_py(self, tmpdir):
         with pytest.raises(Exception) as e_info:
             meta_utils._setup_py_run_from_dir(tmpdir.strpath)
         assert tmpdir.strpath in str(e_info)
 
-    def test_simple(self, tmpdir):
-        setuppy = tmpdir.mkdir("setuppy").join("setup.py")
-        with open(setuppy.strpath, "a") as f:
-            f.write("""import setuptools
-setuptools.setup(
-    name='testpkg',
-    install_requires=['foo', 'bar'],
-)
-""")
-        data = meta_utils._setup_py_run_from_dir(tmpdir.strpath)
-        assert data["data"]["install_requires"] == ['foo', 'bar']
-
-    def test_with_unicode(self, tmpdir):
-        setuppy = tmpdir.mkdir("setuppy").join("setup.py")
-        with open(setuppy.strpath, "a") as f:
-            f.write("""import setuptools
-setuptools.setup(
-    name='testpkg',
-    author="的å",
-    install_requires=['foo', 'bar'],
-)
-""")
-        data = meta_utils._setup_py_run_from_dir(tmpdir.strpath)
-        assert data["data"]["install_requires"] == ['foo', 'bar']
-
-    def test_with_unicode_and_header(self, tmpdir):
-        setuppy = tmpdir.mkdir("setuppy").join("setup.py")
-        with open(setuppy.strpath, "a") as f:
-            f.write("""# -*- coding: utf8 -*-
-import setuptools
-setuptools.setup(
-    name='testpkg',
-    author="的å",
-    install_requires=['foo', 'bar'],
-)
-""")
-        data = meta_utils._setup_py_run_from_dir(tmpdir.strpath)
-        assert data["data"]["install_requires"] == ['foo', 'bar']
+    @pytest.mark.parametrize("fixture_name,expected_data", [
+        (
+            "setuptools_simple", {
+                'entry_points': None, 'extras_require': None,
+                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'has_ext_modules': None, 'scripts': None,
+                'data_files': None, 'tests_require': None}
+        ),
+        (
+            "setuptools_simple_unicode", {
+                'entry_points': None, 'extras_require': None,
+                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'has_ext_modules': None, 'scripts': None,
+                'data_files': None, 'tests_require': None}
+        ),
+        (
+            "setuptools_simple_unicode_and_header", {
+                'entry_points': None, 'extras_require': None,
+                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'has_ext_modules': None, 'scripts': None,
+                'data_files': None, 'tests_require': None}
+        ),
+        (
+            "setuptools_full", {
+                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'has_ext_modules': None, 'scripts': ['scripts/testpkg'],
+                'data_files': [
+                    ['share/doc/testpgk',
+                     ['AUTHORS', 'LICENSE', 'README.rst']],
+                    ['share/doc/testpkg/html', ['doc/testpkg.html']],
+                    ['man/man1', ['doc/testpkg.1']]
+                ], 'tests_require': ['testpkg1'], 'entry_points':
+                {
+                    'console_scripts': ['testpkgp1=testpkg:main']
+                },
+                'extras_require': {
+                    'extra1': ['ex11', 'ex12'],
+                    'extra2': ['ex21>=3.4', 'ex22>=0.11.0,!=0.15.0']
+                }
+            }
+        ),
+        (
+            "distutils_simple",
+            {'data_files': None, 'has_ext_modules': None, 'scripts': None}
+        ),
+        (
+            "pbr_simple",
+            {'entry_points': {'console_scripts': ['entry2 = pkg1:main']},
+             'extras_require': {}, 'install_requires': [],
+             'setup_requires': ['pbr>=1.0'], 'has_ext_modules': None,
+             'scripts': None, 'data_files': None, 'tests_require': None}
+        ),
+    ])
+    def test_run_setup_py_from_dir(self, tmpdir, monkeypatch,
+                                   fixture_name, expected_data):
+        # the given fixture name is the directory name in the tests/fixtures
+        # dir. copy that fixtures dir to a temp dir and run _setup_py_from_dir
+        # PBR_VERSION is needed for the PBR tests because the fixture are not
+        # containing a git repo
+        monkeypatch.setenv("PBR_VERSION", "1")
+        fixture_dir = os.path.join(fixtures_base_dir, fixture_name)
+        dest_dir = os.path.join(tmpdir.strpath, fixture_name)
+        shutil.copytree(fixture_dir, dest_dir)
+        data = meta_utils._setup_py_run_from_dir(dest_dir)
+        print(data)
+        assert data['data'] == expected_data
