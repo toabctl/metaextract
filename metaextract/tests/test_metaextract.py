@@ -95,22 +95,31 @@ class TestMetaExtract(object):
         assert os.path.exists(tempdir) is False
 
     def test__enter_single_subdir_0_dir(self, tmpdir):
+        current_cwd = os.getcwd()
         with meta_utils._enter_single_subdir(tmpdir.strpath) as dest_dir:
             assert dest_dir == tmpdir.strpath
+        # back in the original working dir
+        assert current_cwd == os.getcwd()
 
     def test__enter_single_subdir_1_dir(self, tmpdir):
+        current_cwd = os.getcwd()
         d1 = os.path.join(tmpdir.strpath, "dir1")
         os.mkdir(d1)
         with meta_utils._enter_single_subdir(tmpdir.strpath) as dest_dir:
             assert dest_dir == d1
+        # back in the original working dir
+        assert current_cwd == os.getcwd()
 
     def test__enter_single_subdir_2_dirs(self, tmpdir):
+        current_cwd = os.getcwd()
         d1 = os.path.join(tmpdir.strpath, "dir1")
         d2 = os.path.join(tmpdir.strpath, "dir2")
         os.mkdir(d1)
         os.mkdir(d2)
         with meta_utils._enter_single_subdir(tmpdir.strpath) as dest_dir:
             assert dest_dir == tmpdir.strpath
+        # back in the original working dir
+        assert current_cwd == os.getcwd()
 
     def test__set_file_encoding_utf8(self, tmpdir):
         testfile = tmpdir.mkdir("encoding").join("setup.py")
