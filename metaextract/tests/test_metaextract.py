@@ -186,6 +186,10 @@ class TestMetaExtract(object):
             {'data_files': None, 'has_ext_modules': None, 'scripts': None}
         ),
         (
+            "distutils_with_extension",
+            {'data_files': None, 'has_ext_modules': True, 'scripts': None}
+        ),
+        (
             "pbr_simple",
             {'entry_points': {'console_scripts': ['entry2 = pkg1:main']},
              'extras_require': {}, 'install_requires': [],
@@ -204,5 +208,4 @@ class TestMetaExtract(object):
         dest_dir = os.path.join(tmpdir.strpath, fixture_name)
         shutil.copytree(fixture_dir, dest_dir)
         data = meta_utils._setup_py_run_from_dir(dest_dir)
-        print(data)
         assert data['data'] == expected_data
