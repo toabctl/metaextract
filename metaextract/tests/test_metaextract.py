@@ -133,7 +133,7 @@ class TestMetaExtract(object):
     def test_from_archive(self, tararchive):
         tar_name, tar_files = tararchive
         data = meta_utils.from_archive(tar_name)
-        assert data["data"]["install_requires"] == ['foo', 'bar']
+        assert data["data"]["install_requires"] == ['bar', 'foo']
 
     def test_no_setup_py(self, tmpdir):
         with pytest.raises(Exception) as e_info:
@@ -144,33 +144,33 @@ class TestMetaExtract(object):
         (
             "setuptools_simple", {
                 'entry_points': None, 'extras_require': None,
-                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'install_requires': ['bar', 'foo'], 'setup_requires': None,
                 'has_ext_modules': None, 'scripts': None,
                 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_simple_unicode", {
                 'entry_points': None, 'extras_require': None,
-                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'install_requires': ['bar', 'foo'], 'setup_requires': None,
                 'has_ext_modules': None, 'scripts': None,
                 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_simple_unicode_and_header", {
                 'entry_points': None, 'extras_require': None,
-                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'install_requires': ['bar', 'foo'], 'setup_requires': None,
                 'has_ext_modules': None, 'scripts': None,
                 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_full", {
-                'install_requires': ['foo', 'bar'], 'setup_requires': None,
+                'install_requires': ['bar', 'foo'], 'setup_requires': None,
                 'has_ext_modules': None, 'scripts': ['scripts/testpkg'],
                 'data_files': [
+                    ['man/man1', ['doc/testpkg.1']],
                     ['share/doc/testpgk',
                      ['AUTHORS', 'LICENSE', 'README.rst']],
                     ['share/doc/testpkg/html', ['doc/testpkg.html']],
-                    ['man/man1', ['doc/testpkg.1']]
                 ], 'tests_require': ['testpkg1'], 'entry_points':
                 {
                     'console_scripts': ['testpkgp1=testpkg:main']

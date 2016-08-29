@@ -110,6 +110,13 @@ def _setup_py_run_from_dir(root_dir):
         # read json file and return data
         with open(output_json.name, "r") as f:
             data = json.loads(f.read())
+
+        # sort some of the keys if the dict values are lists
+        for key in ['data_files', 'entry_points', 'extras_require',
+                    'install_requires', 'setup_requires', 'scripts',
+                    'tests_require', 'tests_suite']:
+            if key in data['data'] and isinstance(data['data'][key], list):
+                data['data'][key] = sorted(data['data'][key])
     return data
 
 
