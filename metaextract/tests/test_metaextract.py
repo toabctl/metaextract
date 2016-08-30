@@ -143,14 +143,15 @@ class TestMetaExtract(object):
     @pytest.mark.parametrize("fixture_name,expected_data", [
         (
             "setuptools_simple", {
-                'entry_points': None, 'extras_require': None,
+                'entry_points': None, 'extras_require': {'extra1': 'pkg1'},
                 'install_requires': ['bar', 'foo'], 'setup_requires': None,
                 'has_ext_modules': None, 'scripts': None,
                 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_simple_unicode", {
-                'entry_points': None, 'extras_require': None,
+                'entry_points': None, 'extras_require': {
+                    'extra1': 'pkg1', 'extra2': ['pkg2', 'pkg3']},
                 'install_requires': ['bar', 'foo'], 'setup_requires': None,
                 'has_ext_modules': None, 'scripts': None,
                 'data_files': None, 'tests_require': None}
