@@ -29,7 +29,7 @@ Bugs
 ----
 If you run into bugs, you can file them in the `issue tracker`_.
 
-.. _'readthedocs`: http://metaextract.readthedocs.io/
+.. _`readthedocs`: http://metaextract.readthedocs.io/
 .. _`py2pack`: https://pypi.python.org/pypi/py2pack
 .. _`issue tracker`: https://github.com/toabctl/metaextract/issues
 .. _`Python Package Index`: https://pypi.python.org/
