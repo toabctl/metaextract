@@ -122,6 +122,12 @@ def _setup_py_run_from_dir(root_dir):
 
 ###############################################################################
 def from_archive(archive_filename):
+    """extract metadata from a given sdist archive file
+
+    :param archive_filename: a sdist archive file
+
+    :returns: a json blob with metadata
+"""
     with _extract_to_tempdir(archive_filename) as root_dir:
         data = _setup_py_run_from_dir(root_dir)
     return data
