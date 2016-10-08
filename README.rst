@@ -2,7 +2,10 @@ metaextract - get metadata for python modules
 =============================================
 
 .. image:: https://travis-ci.org/toabctl/metaextract.png?branch=master
-        :target: https://travis-ci.org/toabctl/metaextract
+           :target: https://travis-ci.org/toabctl/metaextract
+.. image:: https://readthedocs.org/projects/metaextract/badge/
+           :target: http://metaextract.readthedocs.io/en/latest/
+           :alt: Documentation Status
 
 metaextract is a tool to collect metadata about a python module. For example
 you may have a sdist tarball from the `Python Package Index`_ and you want to
