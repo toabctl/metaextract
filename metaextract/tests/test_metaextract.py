@@ -18,6 +18,7 @@
 import os
 import pytest
 import shutil
+import sys
 import tarfile
 
 from metaextract import utils as meta_utils
@@ -137,7 +138,7 @@ class TestMetaExtract(object):
 
     def test_no_setup_py(self, tmpdir):
         with pytest.raises(Exception) as e_info:
-            meta_utils._setup_py_run_from_dir(tmpdir.strpath)
+            meta_utils._setup_py_run_from_dir(tmpdir.strpath, sys.executable)
         assert tmpdir.strpath in str(e_info)
 
     @pytest.mark.parametrize("fixture_name,expected_data", [
@@ -210,5 +211,5 @@ class TestMetaExtract(object):
         fixture_dir = os.path.join(fixtures_base_dir, fixture_name)
         dest_dir = os.path.join(tmpdir.strpath, fixture_name)
         shutil.copytree(fixture_dir, dest_dir)
-        data = meta_utils._setup_py_run_from_dir(dest_dir)
+        data = meta_utils._setup_py_run_from_dir(dest_dir, sys.executable)
         assert data['data'] == expected_data

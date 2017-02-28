@@ -88,7 +88,7 @@ def _set_file_encoding_utf8(filename):
         f.write("# -*- coding: utf-8 -*-\n" + content)
 
 
-def _setup_py_run_from_dir(root_dir):
+def _setup_py_run_from_dir(root_dir, py_interpreter):
     """run the extractmeta command via the setup.py in the given root_dir.
     the output of extractmeta is json and is stored in a tempfile
     which is then read in and returned as data"""
@@ -99,10 +99,8 @@ def _setup_py_run_from_dir(root_dir):
                 single_subdir))
         # generate a temporary json file which contains the metadata
         output_json = tempfile.NamedTemporaryFile()
-        # use the same python interpreter the process currently uses
-        # TODO: make the interpreter configurable
         cmd = "%s setup.py -q --command-packages metaextract " \
-              "metaextract -o %s " % (sys.executable, output_json.name)
+              "metaextract -o %s " % (py_interpreter, output_json.name)
         try:
             subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
         except subprocess.CalledProcessError:
@@ -124,13 +122,14 @@ def _setup_py_run_from_dir(root_dir):
 
 
 ###############################################################################
-def from_archive(archive_filename):
+def from_archive(archive_filename, py_interpreter=sys.executable):
     """extract metadata from a given sdist archive file
 
     :param archive_filename: a sdist archive file
+    :param py_interpreter: The full path to the used python interpreter
 
     :returns: a json blob with metadata
 """
     with _extract_to_tempdir(archive_filename) as root_dir:
-        data = _setup_py_run_from_dir(root_dir)
+        data = _setup_py_run_from_dir(root_dir, py_interpreter)
     return data

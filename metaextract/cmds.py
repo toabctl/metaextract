@@ -19,12 +19,17 @@ from __future__ import print_function
 
 import argparse
 import json
+import sys
 
 from . import utils as meta_utils
 
 
 def main():
     parser = argparse.ArgumentParser(prog="metaextract")
+    parser.add_argument('--python', type=str, nargs=1,
+                        help='path to the python interpreter which is used'
+                        'when calling setup.py. Defaults to %(default)s',
+                        default=sys.executable)
     parser.add_argument('archive', type=str, nargs=1,
                         help='filename of the archive')
     args = parser.parse_args()
