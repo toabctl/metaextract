@@ -20,7 +20,7 @@ from __future__ import print_function
 import argparse
 import json
 
-import utils as meta_utils
+from . import utils as meta_utils
 
 
 def main():
