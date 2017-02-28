@@ -38,7 +38,7 @@ setuptools.setup(
     cmdclass=metaextract.setup.get_cmdclass(),
     tests_require=["flake8", "pytest", "mock"],
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
