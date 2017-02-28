@@ -46,8 +46,8 @@ class metaextract(Command):
 
         # keep list ordered!
         for key in ['data_files', 'entry_points', 'extras_require',
-                    'install_requires', 'setup_requires', 'scripts',
-                    'tests_require', 'tests_suite']:
+                    'install_requires', 'python_requires', 'setup_requires',
+                    'scripts', 'tests_require', 'tests_suite']:
             if hasattr(self.distribution, key):
                 data[key] = getattr(self.distribution, key)
 

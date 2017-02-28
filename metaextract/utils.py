@@ -22,6 +22,7 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tarfile
 import tempfile
 import zipfile
@@ -98,8 +99,10 @@ def _setup_py_run_from_dir(root_dir):
                 single_subdir))
         # generate a temporary json file which contains the metadata
         output_json = tempfile.NamedTemporaryFile()
-        cmd = "python setup.py -q --command-packages metaextract " \
-              "metaextract -o %s " % output_json.name
+        # use the same python interpreter the process currently uses
+        # TODO: make the interpreter configurable
+        cmd = "%s setup.py -q --command-packages metaextract " \
+              "metaextract -o %s " % (sys.executable, output_json.name)
         try:
             subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
         except subprocess.CalledProcessError:

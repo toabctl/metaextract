@@ -144,28 +144,29 @@ class TestMetaExtract(object):
         (
             "setuptools_simple", {
                 'entry_points': None, 'extras_require': {'extra1': 'pkg1'},
-                'install_requires': ['bar', 'foo'], 'setup_requires': None,
-                'has_ext_modules': None, 'scripts': None,
-                'data_files': None, 'tests_require': None}
+                'install_requires': ['bar', 'foo'], 'python_requires': None,
+                'setup_requires': None, 'has_ext_modules': None,
+                'scripts': None, 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_simple_unicode", {
                 'entry_points': None, 'extras_require': {
                     'extra1': 'pkg1', 'extra2': ['pkg2', 'pkg3']},
-                'install_requires': ['bar', 'foo'], 'setup_requires': None,
-                'has_ext_modules': None, 'scripts': None,
-                'data_files': None, 'tests_require': None}
+                'install_requires': ['bar', 'foo'], 'python_requires': None,
+                'setup_requires': None, 'has_ext_modules': None,
+                'scripts': None, 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_simple_unicode_and_header", {
                 'entry_points': None, 'extras_require': None,
-                'install_requires': ['bar', 'foo'], 'setup_requires': None,
-                'has_ext_modules': None, 'scripts': None,
-                'data_files': None, 'tests_require': None}
+                'install_requires': ['bar', 'foo'], 'python_requires': None,
+                'setup_requires': None, 'has_ext_modules': None,
+                'scripts': None, 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_full", {
                 'install_requires': ['bar', 'foo'], 'setup_requires': None,
+                'python_requires': '>=2.6,!=3.0.*,!=3.1.*,!=3.2.*',
                 'has_ext_modules': None, 'scripts': ['scripts/testpkg'],
                 'data_files': [
                     ['man/man1', ['doc/testpkg.1']],
@@ -194,8 +195,9 @@ class TestMetaExtract(object):
             "pbr_simple",
             {'entry_points': {'console_scripts': ['entry2 = pkg1:main']},
              'extras_require': {}, 'install_requires': [],
-             'setup_requires': ['pbr>=1.0'], 'has_ext_modules': None,
-             'scripts': None, 'data_files': None, 'tests_require': None}
+             'python_requires': None, 'setup_requires': ['pbr>=1.0'],
+             'has_ext_modules': None, 'scripts': None, 'data_files': None,
+             'tests_require': None}
         ),
     ])
     def test_run_setup_py_from_dir(self, tmpdir, monkeypatch,

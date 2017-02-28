@@ -16,6 +16,7 @@ setuptools.setup(
                 ('man/man1', ['doc/testpkg.1'])],
     tests_require=["testpkg1"],
     test_suite="pkgtestsuite",
+    python_requires=">=2.6,!=3.0.*,!=3.1.*,!=3.2.*",
     classifiers=[
         'Intended Audience :: Developers',
     ],
