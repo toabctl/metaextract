@@ -50,6 +50,9 @@ class metaextract(Command):
                     'scripts', 'tests_require', 'tests_suite']:
             if hasattr(self.distribution, key):
                 data[key] = getattr(self.distribution, key)
+                # dict_items objects can not be serialized with json
+                if data[key].__class__.__name__ == 'dict_items':
+                    data[key] = list(data[key])
 
         # keep list ordered!
         for func in ['has_ext_modules']:
