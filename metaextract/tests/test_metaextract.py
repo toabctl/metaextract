@@ -144,29 +144,29 @@ class TestMetaExtract(object):
     @pytest.mark.parametrize("fixture_name,expected_data", [
         (
             "setuptools_simple", {
-                'entry_points': None, 'extras_require': {'extra1': 'pkg1'},
+                'entry_points': None, 'extras_require': {'extra1': ['pkg1']},
                 'install_requires': ['bar', 'foo'], 'python_requires': None,
-                'setup_requires': None, 'has_ext_modules': None,
+                'setup_requires': [], 'has_ext_modules': None,
                 'scripts': None, 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_simple_unicode", {
                 'entry_points': None, 'extras_require': {
-                    'extra1': 'pkg1', 'extra2': ['pkg2', 'pkg3']},
+                    'extra1': ['pkg1'], 'extra2': ['pkg2', 'pkg3']},
                 'install_requires': ['bar', 'foo'], 'python_requires': None,
-                'setup_requires': None, 'has_ext_modules': None,
+                'setup_requires': [], 'has_ext_modules': None,
                 'scripts': None, 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_simple_unicode_and_header", {
-                'entry_points': None, 'extras_require': None,
+                'entry_points': None, 'extras_require': {},
                 'install_requires': ['bar', 'foo'], 'python_requires': None,
-                'setup_requires': None, 'has_ext_modules': None,
+                'setup_requires': [], 'has_ext_modules': None,
                 'scripts': None, 'data_files': None, 'tests_require': None}
         ),
         (
             "setuptools_full", {
-                'install_requires': ['bar', 'foo'], 'setup_requires': None,
+                'install_requires': ['bar', 'foo'], 'setup_requires': [],
                 'python_requires': '>=2.6,!=3.0.*,!=3.1.*,!=3.2.*',
                 'has_ext_modules': None, 'scripts': ['scripts/testpkg'],
                 'data_files': [
@@ -180,7 +180,7 @@ class TestMetaExtract(object):
                 },
                 'extras_require': {
                     'extra1': ['ex11', 'ex12'],
-                    'extra2': ['ex21>=3.4', 'ex22>=0.11.0,!=0.15.0']
+                    'extra2': ['ex21>=3.4', 'ex22!=0.15.0,>=0.11.0']
                 }
             }
         ),
