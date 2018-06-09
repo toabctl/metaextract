@@ -53,6 +53,10 @@ class metaextract(Command):
                 # dict_items objects can not be serialized with json
                 if data[key].__class__.__name__ == 'dict_items':
                     data[key] = list(data[key])
+                if key == 'entry_points' and isinstance(data[key], dict):
+                    for k, v in data[key].items():
+                        if isinstance(v, set):
+                            data[key][k] = list(v)
 
         # keep list ordered!
         for func in ['has_ext_modules']:
