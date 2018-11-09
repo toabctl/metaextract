@@ -212,4 +212,6 @@ class TestMetaExtract(object):
         dest_dir = os.path.join(tmpdir.strpath, fixture_name)
         shutil.copytree(fixture_dir, dest_dir)
         data = meta_utils._setup_py_run_from_dir(dest_dir, sys.executable)
-        assert data['data'] == expected_data
+        for expected_key, expected_val in expected_data.items():
+            assert expected_key in data['data']
+            assert data['data'][expected_key] == expected_val
