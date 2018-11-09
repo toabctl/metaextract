@@ -2,7 +2,11 @@ import setuptools
 
 setuptools.setup(
     name='testpkg',
+    version='1.2.3',
     author="的å",
+    license='Apache-2.0',
+    description='desc',
+    long_description='long desc',
     install_requires=['foo', 'bar'],
     extras_require={
         'extra1': ["ex11", "ex12"],

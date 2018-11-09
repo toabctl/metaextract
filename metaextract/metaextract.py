@@ -43,7 +43,6 @@ class metaextract(Command):
 
     def run(self):
         data = dict()
-
         # keep list ordered!
         for key in ['data_files', 'entry_points', 'extras_require',
                     'install_requires', 'python_requires', 'setup_requires',
@@ -59,9 +58,17 @@ class metaextract(Command):
                             data[key][k] = list(v)
 
         # keep list ordered!
-        for func in ['has_ext_modules']:
+        for func in ['get_author', 'get_author_email', 'get_classifiers',
+                     'get_contact', 'get_contact_email', 'get_description',
+                     'get_download_url', 'get_fullname', 'get_keywords',
+                     'get_license', 'get_long_description', 'get_mainainer',
+                     'get_maintainer_email', 'get_name', 'get_url',
+                     'get_version', 'get_download_url',
+                     'get_fullname', 'get_author', 'get_author_email',
+                     'has_ext_modules']:
             if hasattr(self.distribution, func):
-                data[func] = getattr(self.distribution, func)()
+                data['{}'.format(func.replace('get_', ''))] = getattr(
+                    self.distribution, func)()
 
         data_with_version = {
             'version': DATA_VERSION,

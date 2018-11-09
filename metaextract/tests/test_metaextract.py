@@ -181,12 +181,21 @@ class TestMetaExtract(object):
                 'extras_require': {
                     'extra1': ['ex11', 'ex12'],
                     'extra2': ['ex21>=3.4', 'ex22!=0.15.0,>=0.11.0']
-                }
+                },
+                'version': '1.2.3',
+                'name': 'testpkg',
+                'fullname': 'testpkg-1.2.3',
+                'description': 'desc',
+                'long_description': 'long desc',
+                'classifiers': ['Intended Audience :: Developers'],
+                'license': 'Apache-2.0',
+
             }
         ),
         (
             "distutils_simple",
-            {'data_files': None, 'has_ext_modules': None, 'scripts': None}
+            {'data_files': None, 'has_ext_modules': None, 'scripts': None,
+             'version': '1.0'}
         ),
         (
             "distutils_with_extension",
@@ -198,7 +207,8 @@ class TestMetaExtract(object):
              'extras_require': {}, 'install_requires': [],
              'python_requires': None, 'setup_requires': ['pbr>=1.0'],
              'has_ext_modules': None, 'scripts': None, 'data_files': None,
-             'tests_require': None}
+             'tests_require': None,
+             'version': '1'}
         ),
     ])
     def test_run_setup_py_from_dir(self, tmpdir, monkeypatch,
@@ -212,4 +222,6 @@ class TestMetaExtract(object):
         dest_dir = os.path.join(tmpdir.strpath, fixture_name)
         shutil.copytree(fixture_dir, dest_dir)
         data = meta_utils._setup_py_run_from_dir(dest_dir, sys.executable)
-        assert data['data'] == expected_data
+        for expected_key, expected_val in expected_data.items():
+            assert expected_key in data['data']
+            assert data['data'][expected_key] == expected_val
