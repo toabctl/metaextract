@@ -106,7 +106,10 @@ def _setup_py_run_from_dir(root_dir, py_interpreter):
         except subprocess.CalledProcessError:
             # try again with a encoding in setup.py
             _set_file_encoding_utf8("setup.py")
-            subprocess.check_output(cmd, shell=True)
+            try:
+                subprocess.check_output(cmd, shell=True)
+            except subprocess.CalledProcessError:
+                return data
 
         # read json file and return data
         with open(output_json.name, "r") as f:
