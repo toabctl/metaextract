@@ -73,7 +73,7 @@ class TestMetaExtract(object):
         with pytest.raises(Exception) as e_info:
             with meta_utils._extract_to_tempdir("foobar"):
                 pass
-        assert "foobar" in str(e_info)
+        assert "foobar" in str(e_info.value)
 
     def test__extract_to_tempdir_tar_archive(self, tararchive):
         tarball_name, tarball_files = tararchive
@@ -139,7 +139,7 @@ class TestMetaExtract(object):
     def test_no_setup_py(self, tmpdir):
         with pytest.raises(Exception) as e_info:
             meta_utils._setup_py_run_from_dir(tmpdir.strpath, sys.executable)
-        assert tmpdir.strpath in str(e_info)
+        assert tmpdir.strpath in str(e_info.value)
 
     @pytest.mark.parametrize("fixture_name,expected_data", [
         (
