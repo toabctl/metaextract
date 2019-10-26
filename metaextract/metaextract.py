@@ -78,6 +78,7 @@ class metaextract(Command):
         if self.output:
             with open(self.output, "w+") as f:
                 f.write(json.dumps(data_with_version, indent=2,
-                                   sort_keys=True))
+                                   sort_keys=True, default=str))
         else:
-            print(json.dumps(data_with_version, indent=2, sort_keys=True))
+            print(json.dumps(data_with_version, indent=2,
+                             sort_keys=True, default=str))
