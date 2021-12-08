@@ -34,7 +34,6 @@ setuptools.setup(
     author_email="thomasbechtold@jpberlin.de",
     url='http://github.com/toabctl/metaextract',
     packages=['metaextract'],
-    setup_requires=["setuptools", "pytest-runner"],
     cmdclass=metaextract.setup.get_cmdclass(),
     tests_require=["flake8", "pytest", "mock"],
     classifiers=[
