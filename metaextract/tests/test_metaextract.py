@@ -210,9 +210,34 @@ class TestMetaExtract(object):
              'tests_require': None,
              'version': '1'}
         ),
+        (
+            "pyproject",
+            {
+                'install_requires': ['bar', 'foo'], 'setup_requires': [],
+                'python_requires': '!=3.0.*,!=3.1.*,!=3.2.*,>=2.6',
+                'entry_points':
+                {
+                    'console_scripts': ['testpkgp1 = testpkg:main']
+                },
+                'extras_require': {
+                    'extra1': ['ex11', 'ex12'],
+                    'extra2': ['ex21>=3.4', 'ex22!=0.15.0,>=0.11.0']
+                },
+                'version': '1.2.3',
+                'name': 'testpkg',
+                'fullname': 'testpkg-1.2.3',
+                'description': 'desc',
+                'long_description': 'long desc\n',
+                'classifiers': ['Intended Audience :: Developers'],
+                'license': 'Apache-2.0',
+            }
+        ),
     ])
     def test_run_setup_py_from_dir(self, tmpdir, monkeypatch,
                                    fixture_name, expected_data):
+        if fixture_name == "pyproject" and sys.version_info < (3, 0):
+            pytest.skip("pyproject.toml is not supported for python2")
+
         # the given fixture name is the directory name in the tests/fixtures
         # dir. copy that fixtures dir to a temp dir and run _setup_py_from_dir
         # PBR_VERSION is needed for the PBR tests because the fixture are not

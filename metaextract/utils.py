@@ -95,8 +95,14 @@ def _setup_py_run_from_dir(root_dir, py_interpreter):
     data = {}
     with _enter_single_subdir(root_dir) as single_subdir:
         if not os.path.exists("setup.py"):
-            raise Exception("'setup.py' does not exist in '%s'" % (
-                single_subdir))
+            if not os.path.exists("pyproject.toml"):
+                raise Exception("'setup.py' does not exist in '%s'" % (
+                    single_subdir))
+
+            # Create it for pyproject.toml without setup.py
+            with open("setup.py", "w") as f:
+                f.write("from setuptools import setup\nsetup()\n")
+
         # generate a temporary json file which contains the metadata
         output_json = tempfile.NamedTemporaryFile()
         cmd = "%s setup.py -q --command-packages metaextract " \
