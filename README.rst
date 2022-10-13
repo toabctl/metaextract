@@ -1,8 +1,8 @@
 metaextract - get metadata for python modules
 =============================================
 
-.. image:: https://travis-ci.org/toabctl/metaextract.png?branch=master
-           :target: https://travis-ci.org/toabctl/metaextract
+.. image:: https://github.com/toabctl/metaextract/actions/workflows/ci.yaml/badge.svg?branch=master
+           :target: https://github.com/toabctl/metaextract/actions
 .. image:: https://readthedocs.org/projects/metaextract/badge/
            :target: http://metaextract.readthedocs.io/en/latest/
            :alt: Documentation Status
