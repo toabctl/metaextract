@@ -21,11 +21,18 @@ import shutil
 import sys
 import tarfile
 
+import setuptools
+
 from metaextract import utils as meta_utils
 
 
 base_dir = os.path.dirname(__file__)
 fixtures_base_dir = os.path.join(base_dir, "fixtures")
+
+# setuptools >= 70 removed the tests_require attribute from Distribution
+_HAS_TESTS_REQUIRE = hasattr(
+    setuptools.Distribution({}), 'tests_require'
+)
 
 
 @pytest.fixture()
@@ -141,100 +148,129 @@ class TestMetaExtract(object):
             meta_utils._setup_py_run_from_dir(tmpdir.strpath, sys.executable)
         assert tmpdir.strpath in str(e_info.value)
 
-    @pytest.mark.parametrize("fixture_name,expected_data", [
-        (
-            "setuptools_simple", {
-                'entry_points': None, 'extras_require': {'extra1': ['pkg1']},
-                'install_requires': ['bar', 'foo'], 'python_requires': None,
-                'setup_requires': [], 'has_ext_modules': None,
-                'scripts': None, 'data_files': None, 'tests_require': None}
-        ),
-        (
-            "setuptools_simple_unicode", {
-                'entry_points': None, 'extras_require': {
-                    'extra1': ['pkg1'], 'extra2': ['pkg2', 'pkg3']},
-                'install_requires': ['bar', 'foo'], 'python_requires': None,
-                'setup_requires': [], 'has_ext_modules': None,
-                'scripts': None, 'data_files': None, 'tests_require': None}
-        ),
-        (
-            "setuptools_simple_unicode_and_header", {
-                'entry_points': None, 'extras_require': {},
-                'install_requires': ['bar', 'foo'], 'python_requires': None,
-                'setup_requires': [], 'has_ext_modules': None,
-                'scripts': None, 'data_files': None, 'tests_require': None}
-        ),
-        (
-            "setuptools_full", {
-                'install_requires': ['bar', 'foo'], 'setup_requires': [],
-                'python_requires': '>=2.6,!=3.0.*,!=3.1.*,!=3.2.*',
-                'has_ext_modules': None, 'scripts': ['scripts/testpkg'],
-                'data_files': [
-                    ['man/man1', ['doc/testpkg.1']],
-                    ['share/doc/testpgk',
-                     ['AUTHORS', 'LICENSE', 'README.rst']],
-                    ['share/doc/testpkg/html', ['doc/testpkg.html']],
-                ], 'tests_require': ['testpkg1'], 'entry_points':
+    @pytest.mark.parametrize(
+        "fixture_name,expected_data,expected_tests_require", [
+            (
+                "setuptools_simple", {
+                    'entry_points': None,
+                    'extras_require': {'extra1': ['pkg1']},
+                    'install_requires': ['bar', 'foo'],
+                    'python_requires': None,
+                    'setup_requires': [],
+                    'has_ext_modules': None,
+                    'scripts': None, 'data_files': None},
+                None
+            ),
+            (
+                "setuptools_simple_unicode", {
+                    'entry_points': None, 'extras_require': {
+                        'extra1': ['pkg1'], 'extra2': ['pkg2', 'pkg3']},
+                    'install_requires': ['bar', 'foo'],
+                    'python_requires': None,
+                    'setup_requires': [],
+                    'has_ext_modules': None,
+                    'scripts': None, 'data_files': None},
+                None
+            ),
+            (
+                "setuptools_simple_unicode_and_header", {
+                    'entry_points': None, 'extras_require': {},
+                    'install_requires': ['bar', 'foo'],
+                    'python_requires': None,
+                    'setup_requires': [],
+                    'has_ext_modules': None,
+                    'scripts': None, 'data_files': None},
+                None
+            ),
+            (
+                "setuptools_full", {
+                    'install_requires': ['bar', 'foo'],
+                    'setup_requires': [],
+                    'python_requires':
+                        '>=2.6,!=3.0.*,!=3.1.*,!=3.2.*',
+                    'has_ext_modules': None,
+                    'scripts': ['scripts/testpkg'],
+                    'data_files': [
+                        ['man/man1', ['doc/testpkg.1']],
+                        ['share/doc/testpgk',
+                         ['AUTHORS', 'LICENSE', 'README.rst']],
+                        ['share/doc/testpkg/html',
+                         ['doc/testpkg.html']],
+                    ], 'entry_points': {
+                        'console_scripts': [
+                            'testpkgp1=testpkg:main']
+                    },
+                    'extras_require': {
+                        'extra1': ['ex11', 'ex12'],
+                        'extra2': ['ex21>=3.4',
+                                   'ex22!=0.15.0,>=0.11.0']
+                    },
+                    'version': '1.2.3',
+                    'name': 'testpkg',
+                    'fullname': 'testpkg-1.2.3',
+                    'description': 'desc',
+                    'long_description': 'long desc',
+                    'classifiers': [
+                        'Intended Audience :: Developers'],
+                    'license': 'Apache-2.0',
+                },
+                ['testpkg1']
+            ),
+            (
+                "distutils_simple",
+                {'data_files': None, 'has_ext_modules': None,
+                 'scripts': None, 'version': '1.0'},
+                None
+            ),
+            (
+                "distutils_with_extension",
+                {'data_files': None, 'has_ext_modules': True,
+                 'scripts': None},
+                None
+            ),
+            (
+                "pbr_simple",
+                {'entry_points': {
+                    'console_scripts': ['entry2 = pkg1:main']},
+                 'extras_require': {}, 'install_requires': [],
+                 'python_requires': None,
+                 'setup_requires': ['pbr>=1.0'],
+                 'has_ext_modules': None,
+                 'scripts': None, 'data_files': None,
+                 'version': '1'},
+                None
+            ),
+            (
+                "pyproject",
                 {
-                    'console_scripts': ['testpkgp1=testpkg:main']
+                    'install_requires': ['bar', 'foo'],
+                    'setup_requires': [],
+                    'python_requires':
+                        '!=3.0.*,!=3.1.*,!=3.2.*,>=2.6',
+                    'entry_points': {
+                        'console_scripts': [
+                            'testpkgp1 = testpkg:main']
+                    },
+                    'extras_require': {
+                        'extra1': ['ex11', 'ex12'],
+                        'extra2': ['ex21>=3.4',
+                                   'ex22!=0.15.0,>=0.11.0']
+                    },
+                    'version': '1.2.3',
+                    'name': 'testpkg',
+                    'fullname': 'testpkg-1.2.3',
+                    'description': 'desc',
+                    'long_description': 'long desc\n',
+                    'classifiers': [
+                        'Intended Audience :: Developers'],
+                    'license': 'Apache-2.0',
                 },
-                'extras_require': {
-                    'extra1': ['ex11', 'ex12'],
-                    'extra2': ['ex21>=3.4', 'ex22!=0.15.0,>=0.11.0']
-                },
-                'version': '1.2.3',
-                'name': 'testpkg',
-                'fullname': 'testpkg-1.2.3',
-                'description': 'desc',
-                'long_description': 'long desc',
-                'classifiers': ['Intended Audience :: Developers'],
-                'license': 'Apache-2.0',
-
-            }
-        ),
-        (
-            "distutils_simple",
-            {'data_files': None, 'has_ext_modules': None, 'scripts': None,
-             'version': '1.0'}
-        ),
-        (
-            "distutils_with_extension",
-            {'data_files': None, 'has_ext_modules': True, 'scripts': None}
-        ),
-        (
-            "pbr_simple",
-            {'entry_points': {'console_scripts': ['entry2 = pkg1:main']},
-             'extras_require': {}, 'install_requires': [],
-             'python_requires': None, 'setup_requires': ['pbr>=1.0'],
-             'has_ext_modules': None, 'scripts': None, 'data_files': None,
-             'tests_require': None,
-             'version': '1'}
-        ),
-        (
-            "pyproject",
-            {
-                'install_requires': ['bar', 'foo'], 'setup_requires': [],
-                'python_requires': '!=3.0.*,!=3.1.*,!=3.2.*,>=2.6',
-                'entry_points':
-                {
-                    'console_scripts': ['testpkgp1 = testpkg:main']
-                },
-                'extras_require': {
-                    'extra1': ['ex11', 'ex12'],
-                    'extra2': ['ex21>=3.4', 'ex22!=0.15.0,>=0.11.0']
-                },
-                'version': '1.2.3',
-                'name': 'testpkg',
-                'fullname': 'testpkg-1.2.3',
-                'description': 'desc',
-                'long_description': 'long desc\n',
-                'classifiers': ['Intended Audience :: Developers'],
-                'license': 'Apache-2.0',
-            }
-        ),
-    ])
+                None
+            ),
+        ])
     def test_run_setup_py_from_dir(self, tmpdir, monkeypatch,
-                                   fixture_name, expected_data):
+                                   fixture_name, expected_data,
+                                   expected_tests_require):
         if fixture_name == "pyproject" and sys.version_info < (3, 0):
             pytest.skip("pyproject.toml is not supported for python2")
 
@@ -250,3 +286,7 @@ class TestMetaExtract(object):
         for expected_key, expected_val in expected_data.items():
             assert expected_key in data['data']
             assert data['data'][expected_key] == expected_val
+        # setuptools >= 70 removed tests_require from Distribution
+        if _HAS_TESTS_REQUIRE:
+            assert data['data'].get('tests_require') == \
+                expected_tests_require
