@@ -19,6 +19,7 @@ from __future__ import print_function
 
 import argparse
 import json
+import subprocess
 import sys
 
 from . import utils as meta_utils
@@ -26,15 +27,19 @@ from . import utils as meta_utils
 
 def main():
     parser = argparse.ArgumentParser(prog="metaextract")
-    parser.add_argument('--python', type=str, nargs=1,
-                        help='path to the python interpreter which is used'
+    parser.add_argument('--python', type=str,
+                        help='path to the python interpreter which is used '
                         'when calling setup.py. Defaults to %(default)s',
                         default=sys.executable)
     parser.add_argument('archive', type=str, nargs=1,
                         help='filename of the archive')
     args = parser.parse_args()
     archive = args.archive[0]
-    data = meta_utils.from_archive(archive)
+    try:
+        data = meta_utils.from_archive(archive, args.python)
+    except subprocess.CalledProcessError as e:
+        sys.stderr.write(e.output.decode("utf-8", "replace"))
+        sys.exit("Running setup.py from '%s' failed" % archive)
     print(json.dumps(data, indent=4, sort_keys=True))
 
 

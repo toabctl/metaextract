@@ -33,6 +33,27 @@ __all__ = [
 ]
 
 
+def _tar_extract_safe(tar, dest_dir):
+    """extract all tar members to dest_dir but refuse members which would
+    end up outside of dest_dir (CVE-2007-4559)"""
+    if hasattr(tarfile, "data_filter"):
+        tar.extractall(dest_dir, filter="data")
+        return
+
+    # no PEP-706 filters available. Without '..' and absolute paths,
+    # neither member names nor link targets can escape dest_dir
+    def is_unsafe(path):
+        return os.path.isabs(path) or ".." in path.split("/")
+
+    for member in tar.getmembers():
+        is_link = member.issym() or member.islnk()
+        if is_unsafe(member.name) or member.isdev() or \
+                (is_link and is_unsafe(member.linkname)):
+            raise Exception("Refusing to extract unsafe tar member '%s'" % (
+                member.name))
+    tar.extractall(dest_dir)
+
+
 @contextmanager
 def _extract_to_tempdir(archive_filename):
     """extract the given tarball or zipfile to a tempdir and change
@@ -45,7 +66,7 @@ def _extract_to_tempdir(archive_filename):
     try:
         if tarfile.is_tarfile(archive_filename):
             with tarfile.open(archive_filename) as f:
-                f.extractall(tempdir)
+                _tar_extract_safe(f, tempdir)
         elif zipfile.is_zipfile(archive_filename):
             with zipfile.ZipFile(archive_filename) as f:
                 f.extractall(tempdir)
@@ -70,8 +91,6 @@ def _enter_single_subdir(root_dir):
             first = os.path.join(root_dir, dir_list[0])
             if os.path.isdir(first):
                 dest_dir = first
-        else:
-            dest_dir = root_dir
         os.chdir(dest_dir)
         yield dest_dir
     finally:
@@ -82,10 +101,27 @@ def _set_file_encoding_utf8(filename):
     """set a encoding header as suggested in PEP-0263. This
     is not entirely correct because we don't know the encoding of the
     given file but it's at least a chance to get metadata from the setup.py"""
-    with open(filename, 'r+') as f:
+    with open(filename, 'rb+') as f:
         content = f.read()
         f.seek(0, 0)
-        f.write("# -*- coding: utf-8 -*-\n" + content)
+        f.write(b"# -*- coding: utf-8 -*-\n" + content)
+
+
+def _sorted(items):
+    """sort a list which may contain items of different types"""
+    try:
+        return sorted(items, key=lambda item: (type(item).__name__, item))
+    except TypeError:
+        return items
+
+
+def _group_data_files(data_files):
+    """distutils allows plain file names besides (dir, files) pairs. If both
+    are mixed, group the file names as ("", files) pair"""
+    files = [f for f in data_files if isinstance(f, str)]
+    if not files or len(files) == len(data_files):
+        return data_files
+    return [f for f in data_files if not isinstance(f, str)] + [["", files]]
 
 
 def _setup_py_run_from_dir(root_dir, py_interpreter):
@@ -104,26 +140,34 @@ def _setup_py_run_from_dir(root_dir, py_interpreter):
                 f.write("from setuptools import setup\nsetup()\n")
 
         # generate a temporary json file which contains the metadata
-        output_json = tempfile.NamedTemporaryFile()
-        cmd = "%s setup.py -q --command-packages metaextract " \
-              "metaextract -o %s " % (py_interpreter, output_json.name)
-        try:
-            subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-        except subprocess.CalledProcessError:
-            # try again with a encoding in setup.py
-            _set_file_encoding_utf8("setup.py")
-            subprocess.check_output(cmd, shell=True)
+        with tempfile.NamedTemporaryFile() as output_json:
+            cmd = [py_interpreter, "setup.py", "-q",
+                   "--command-packages", "metaextract",
+                   "metaextract", "-o", output_json.name]
+            try:
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError as e:
+                # python 2 needs an encoding header for non-ascii
+                # setup.py files
+                if b"no encoding declared" not in (e.output or b""):
+                    raise
+                _set_file_encoding_utf8("setup.py")
+                subprocess.check_output(cmd, stderr=subprocess.STDOUT)
 
-        # read json file and return data
-        with open(output_json.name, "r") as f:
-            data = json.loads(f.read())
+            # read json file and return data
+            with open(output_json.name, "r") as f:
+                data = json.loads(f.read())
+
+        if isinstance(data['data'].get('data_files'), list):
+            data['data']['data_files'] = _group_data_files(
+                data['data']['data_files'])
 
         # sort some of the keys if the dict values are lists
         for key in ['data_files', 'entry_points', 'extras_require',
                     'install_requires', 'setup_requires', 'scripts',
-                    'tests_require', 'tests_suite']:
+                    'tests_require', 'test_suite']:
             if key in data['data'] and isinstance(data['data'][key], list):
-                data['data'][key] = sorted(data['data'][key])
+                data['data'][key] = _sorted(data['data'][key])
     return data
 
 
