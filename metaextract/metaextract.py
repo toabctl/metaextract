@@ -46,7 +46,7 @@ class metaextract(Command):
         # keep list ordered!
         for key in ['data_files', 'entry_points', 'extras_require',
                     'install_requires', 'python_requires', 'setup_requires',
-                    'scripts', 'tests_require', 'tests_suite']:
+                    'scripts', 'tests_require', 'test_suite']:
             if hasattr(self.distribution, key):
                 data[key] = getattr(self.distribution, key)
                 # dict_items objects can not be serialized with json
@@ -55,20 +55,22 @@ class metaextract(Command):
                 if key == 'entry_points' and isinstance(data[key], dict):
                     for k, v in data[key].items():
                         if isinstance(v, set):
-                            data[key][k] = list(v)
+                            data[key][k] = sorted(v)
 
         # keep list ordered!
         for func in ['get_author', 'get_author_email', 'get_classifiers',
                      'get_contact', 'get_contact_email', 'get_description',
                      'get_download_url', 'get_fullname', 'get_keywords',
-                     'get_license', 'get_long_description', 'get_mainainer',
+                     'get_license', 'get_long_description', 'get_maintainer',
                      'get_maintainer_email', 'get_name', 'get_url',
-                     'get_version', 'get_download_url',
-                     'get_fullname', 'get_author', 'get_author_email',
-                     'has_ext_modules']:
+                     'get_version', 'has_ext_modules']:
             if hasattr(self.distribution, func):
                 data['{}'.format(func.replace('get_', ''))] = getattr(
                     self.distribution, func)()
+
+        # setuptools < 83 returns None instead of False
+        if 'has_ext_modules' in data:
+            data['has_ext_modules'] = bool(data['has_ext_modules'])
 
         data_with_version = {
             'version': DATA_VERSION,
