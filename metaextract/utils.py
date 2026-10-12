@@ -108,12 +108,20 @@ def _set_file_encoding_utf8(filename):
 
 
 def _sorted(items):
-    """sort a list which may contain items of different types (i.e.
-    data_files can contain strings and (dir, files) tuples)"""
+    """sort a list which may contain items of different types"""
     try:
         return sorted(items, key=lambda item: (type(item).__name__, item))
     except TypeError:
         return items
+
+
+def _group_data_files(data_files):
+    """distutils allows plain file names besides (dir, files) pairs. If both
+    are mixed, group the file names as ("", files) pair"""
+    files = [f for f in data_files if isinstance(f, str)]
+    if not files or len(files) == len(data_files):
+        return data_files
+    return [f for f in data_files if not isinstance(f, str)] + [["", files]]
 
 
 def _setup_py_run_from_dir(root_dir, py_interpreter):
@@ -149,6 +157,10 @@ def _setup_py_run_from_dir(root_dir, py_interpreter):
             # read json file and return data
             with open(output_json.name, "r") as f:
                 data = json.loads(f.read())
+
+        if isinstance(data['data'].get('data_files'), list):
+            data['data']['data_files'] = _group_data_files(
+                data['data']['data_files'])
 
         # sort some of the keys if the dict values are lists
         for key in ['data_files', 'entry_points', 'extras_require',

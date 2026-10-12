@@ -321,7 +321,16 @@ class TestMetaExtract(object):
 setuptools.setup(name='p', data_files=['b.txt', ('share', ['a.txt'])])
 """})
         data = meta_utils.from_archive(tar_name)
-        assert data["data"]["data_files"] == [['share', ['a.txt']], 'b.txt']
+        assert data["data"]["data_files"] == [
+            ['', ['b.txt']], ['share', ['a.txt']]]
+
+    def test_from_archive_plain_data_files(self, tmpdir):
+        tar_name = _make_tar(tmpdir, {
+            "pkg/setup.py": b"""import setuptools
+setuptools.setup(name='p', data_files=['b.txt', 'a.txt'])
+"""})
+        data = meta_utils.from_archive(tar_name)
+        assert data["data"]["data_files"] == ['a.txt', 'b.txt']
 
     def test_from_archive_interpreter_with_space(self, tmpdir, tararchive):
         tar_name, _ = tararchive
